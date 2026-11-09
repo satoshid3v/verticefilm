@@ -1,0 +1,204 @@
+<!doctype html>
+<!--
+  Vértice FilmCraft — Edición Inmersiva Pantalla Completa
+  Desarrollado por Vertice Codeium
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Vertice Codeium">
+  <meta name="color-scheme" content="dark">
+  <title>Vértice FilmCraft — Estudio Profesional</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="favicon.png" type="image/png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #060608;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
+    }
+    #top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      background: rgba(6, 6, 8, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 100;
+      color: #E5E5EA;
+      font-size: 13px;
+    }
+    #filmcraft_canvas {
+      position: absolute;
+      top: 44px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 44px);
+      display: block;
+      outline: none;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12px;
+    }
+    .btn-action {
+      background: rgba(255, 255, 255, 0.08);
+      color: #FFF;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 5px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 12px;
+      transition: background 0.15s ease;
+    }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+    #loading {
+      position: absolute;
+      inset: 44px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      color: #c9c9cc;
+      font: 14px/1.4 system-ui, sans-serif;
+      background: #09090c;
+      z-index: 50;
+      transition: opacity 0.3s ease;
+    }
+    #loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #fatal {
+      position: absolute;
+      inset: 44px 0 0 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(6, 6, 8, 0.94);
+      color: #e6e6e8;
+      z-index: 60;
+    }
+    #fatal.on { display: flex; }
+    #fatal .box {
+      max-width: min(78ch, calc(100vw - 32px));
+      padding: 24px;
+      background: #16171b;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="top-bar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="index.html" class="btn-action">← Volver al Portal</a>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <svg width="18" height="18" viewBox="-1 -4 26 26" fill="none">
+          <defs>
+            <linearGradient id="ed-fire" x1="12" y1="-3.2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FFE600"/>
+              <stop offset="50%" stop-color="#FF4500"/>
+              <stop offset="100%" stop-color="#6014E4"/>
+            </linearGradient>
+          </defs>
+          <polygon points="6.54,18.64 12,-3.18 17.46,18.64 14.54,19.36 12,9.18 9.46,19.36" fill="url(#ed-fire)" />
+          <polygon points="7.17,7.75 -0.35,12.77 6.94,20.06 9.06,17.94 4.35,13.23 8.83,10.25" fill="url(#ed-fire)" />
+          <polygon points="17.06,20.06 24.35,12.77 16.83,7.75 15.17,10.25 19.65,13.23 14.94,17.94" fill="url(#ed-fire)" />
+        </svg>
+        <span style="font-weight: 600;">Vértice FilmCraft Studio</span>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span class="pill" id="ed-status">Iniciando WebGPU...</span>
+      <button class="btn-action" onclick="document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()">Pantalla Completa</button>
+      <button class="btn-action" onclick="location.reload()">Recargar</button>
+    </div>
+  </div>
+
+  <canvas id="filmcraft_canvas"></canvas>
+
+  <div id="loading">
+    <svg width="48" height="48" viewBox="-1 -4 26 26" fill="none">
+      <polygon points="6.54,18.64 12,-3.18 17.46,18.64 14.54,19.36 12,9.18 9.46,19.36" fill="#FF4500" />
+      <polygon points="7.17,7.75 -0.35,12.77 6.94,20.06 9.06,17.94 4.35,13.23 8.83,10.25" fill="#FF4500" />
+      <polygon points="17.06,20.06 24.35,12.77 16.83,7.75 15.17,10.25 19.65,13.23 14.94,17.94" fill="#FF4500" />
+    </svg>
+    <div id="ed-load-text">Cargando motor de edición FilmCraft…</div>
+  </div>
+
+  <div id="fatal" role="alertdialog">
+    <div class="box">
+      <h1 style="color: #FF4500; font-size: 18px; margin-bottom: 8px;">FilmCraft ha detenido su ejecución</h1>
+      <p style="font-size: 13px; color: #A1A1A6; margin-bottom: 12px;">Los cambios no guardados se preservan en tu almacenamiento OPFS local.</p>
+      <pre id="fatal-msg" style="background: #000; padding: 10px; font-size: 12px; max-height: 200px; overflow: auto; margin-bottom: 14px;"></pre>
+      <button class="btn-action" onclick="location.reload()">Recargar Estudio</button>
+    </div>
+  </div>
+
+  <script>
+    window.filmcraftLoad = {};
+    let lastPanic = null;
+    const origError = console.error.bind(console);
+    console.error = (...a) => {
+      const m = a.map(String).join(" ");
+      if (/panicked at|memory allocation of/.test(m)) lastPanic = m;
+      origError(...a);
+    };
+    window.filmcraftFatal = (what) => {
+      if (window.filmcraftLoad.fatal) return;
+      const msg = lastPanic || String(what && (what.stack || what.message) || what);
+      window.filmcraftLoad.fatal = msg;
+      document.getElementById("fatal-msg").textContent = msg.split("\n\nStack:")[0];
+      document.getElementById("fatal").classList.add("on");
+    };
+    const isFatal = (e) => e instanceof WebAssembly.RuntimeError || /panicked at|unreachable|memory access out of bounds/.test(String(e && e.message || e));
+    addEventListener("error", (ev) => { if (window.filmcraftLoad.readyMs && isFatal(ev.error || ev.message)) window.filmcraftFatal(ev.error || ev.message); });
+    addEventListener("unhandledrejection", (ev) => { if (window.filmcraftLoad.readyMs && isFatal(ev.reason)) window.filmcraftFatal(ev.reason); });
+  </script>
+  <script type="module">
+    const t0 = performance.now();
+    const params = new URLSearchParams(location.search);
+    try {
+      const { default: init, start } = await import("./filmcraft_web.js");
+      await init({ module_or_path: new URL("filmcraft_web_bg.wasm", location.href) });
+      window.filmcraftLoad.wasmMs = performance.now() - t0;
+      await start("filmcraft_canvas");
+      window.filmcraftLoad.readyMs = performance.now() - t0;
+      document.getElementById("loading").classList.add("hidden");
+      document.getElementById("ed-status").textContent = "WebGPU Activo";
+    } catch (e) {
+      const text = String(e && e.stack || e);
+      window.filmcraftLoad.error = text;
+      if (!params.has("webgl") && !params.has("cpu") && /wgpu|webgpu|requestDevice|requestAdapter|GPUDevice|surface/i.test(text)) {
+        params.set("webgl", "");
+        location.replace(location.pathname + "?" + params.toString().replace(/=(&|$)/g, "$1") + location.hash);
+      } else {
+        const s = document.getElementById("ed-load-text");
+        if (s) { s.style.color = "#FF4500"; s.textContent = "Error: " + text; }
+      }
+    }
+  </script>
+</body>
+</html>

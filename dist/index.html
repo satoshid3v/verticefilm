@@ -1,0 +1,800 @@
+<!doctype html>
+<!--
+  Vértice FilmCraft — Edición Cinematográfica Web de Alto Rendimiento
+  Desarrollado por Vertice Codeium
+  Arquitectura: Apple Industrial Design + Vértice Flame & Apple-Kinetic 3D
+-->
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Vertice Codeium">
+  <meta name="description" content="Editor de video no lineal profesional acelerado por WebGPU y WebCodecs en WebAssembly. Potencia de cine en tu navegador sin subir datos a la nube.">
+  <meta name="color-scheme" content="dark">
+  <title>Vértice FilmCraft — Edición Cinematográfica Web de Alto Rendimiento</title>
+  
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="favicon.png" type="image/png">
+  
+  <!-- Tipografía Apple Tight Cadence -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Lienzos y Superficies (Apple Dark Rhythm) */
+      --surface-void: #060608;
+      --surface-tile-charcoal: #0c0c12;
+      --surface-tile-graphite: #111118;
+      --surface-frosted: rgba(6, 6, 8, 0.78);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(255, 255, 255, 0.18);
+
+      /* Paleta Espectral Vértice Flame */
+      --solar-spark: #FFDD00;
+      --thermal-blaze: #FF4500;
+      --magenta-core: #D40078;
+      --electric-violet: #6014E4;
+
+      --gradient-flame-h: linear-gradient(90deg, #FFDD00 0%, #FF4500 35%, #D40078 70%, #6014E4 100%);
+      --gradient-flame-v: linear-gradient(180deg, #FF4500 0%, #D40078 60%, #6014E4 100%);
+      --gradient-flame-glow: radial-gradient(circle, rgba(255,69,0,0.18) 0%, rgba(212,0,120,0.08) 50%, transparent 75%);
+
+      /* Tipografía */
+      --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", "Inter", sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--surface-void);
+      color: #F5F5F7;
+      font-family: var(--font-main);
+      font-size: 17px;
+      line-height: 1.48;
+      letter-spacing: -0.02em;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Tipografía con Tracking Negativo Apple */
+    .hero-title {
+      font-size: clamp(38px, 6vw, 68px);
+      letter-spacing: -0.038em;
+      line-height: 1.06;
+      font-weight: 800;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: -0.028em;
+      line-height: 1.15;
+      font-weight: 700;
+    }
+
+    .editorial-lead {
+      font-size: 17px;
+      line-height: 1.48;
+      letter-spacing: -0.02em;
+      color: #A1A1A6;
+      max-width: 640px;
+    }
+
+    .mono-metric {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: -0.01em;
+    }
+
+    /* Vértice Flame Gradient Text */
+    .text-flame {
+      background: var(--gradient-flame-h);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    /* Botonería Táctil 3D Vértice */
+    .btn-3d-flame {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--gradient-flame-v);
+      color: #FFFFFF;
+      font-family: var(--font-main);
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 13px 28px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 220, 0, 0.35);
+      box-shadow: 
+        inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.50),
+        inset 0 -2.5px 3px 0 rgba(0, 0, 0, 0.40),
+        0 8px 24px -2px rgba(212, 0, 120, 0.45),
+        0 2px 4px 0 rgba(0, 0, 0, 0.40);
+      cursor: pointer;
+      transition: transform 0.14s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, filter 0.15s ease;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn-3d-flame:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.06);
+      box-shadow: 
+        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.75),
+        inset 0 -2.5px 3px 0 rgba(0, 0, 0, 0.30),
+        0 12px 32px -2px rgba(255, 69, 0, 0.65),
+        0 3px 6px 0 rgba(0, 0, 0, 0.50);
+    }
+
+    .btn-3d-flame:active {
+      transform: scale(0.97) translateY(1.5px);
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.65);
+    }
+
+    .btn-3d-dark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(180deg, #1b1b26 0%, #111118 100%);
+      color: #E5E5EA;
+      font-family: var(--font-main);
+      font-size: 15px;
+      font-weight: 500;
+      padding: 13px 26px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 
+        inset 0 1.2px 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 -2px 3px 0 rgba(0, 0, 0, 0.60),
+        0 6px 16px 0 rgba(0, 0, 0, 0.45);
+      cursor: pointer;
+      transition: all 0.14s ease;
+      text-decoration: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn-3d-dark:hover {
+      background: linear-gradient(180deg, #242433 0%, #151520 100%);
+      border-color: rgba(255, 255, 255, 0.20);
+      transform: translateY(-2px);
+      color: #FFFFFF;
+    }
+
+    .btn-3d-dark:active {
+      transform: scale(0.97) translateY(1.5px);
+    }
+
+    /* Pill Badges */
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #C9C9CC;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      backdrop-filter: blur(12px);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #FF4500;
+      box-shadow: 0 0 10px #FF4500;
+      animation: pulse-dot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 0.6; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 14px #FFDD00; }
+    }
+
+    /* Nav Glassmorphism Apple (44-48px) */
+    .nav-bar {
+      height: 48px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--surface-frosted);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(16px, 4vw, 40px);
+    }
+
+    /* Hero Pedestal Section */
+    .hero-section {
+      min-height: 94vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 96px 20px 60px;
+      overflow: hidden;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212,0,120,0.12), transparent 70%);
+    }
+
+    #kinetic-hero-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: auto;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      max-width: 860px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      pointer-events: none;
+    }
+
+    .hero-content > * {
+      pointer-events: auto;
+    }
+
+    /* Museum Pedestal Grid (Tile Graphite #111118) */
+    .tile-charcoal {
+      background-color: var(--surface-tile-charcoal);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 90px clamp(16px, 5vw, 64px);
+    }
+
+    .card-pedestal {
+      background: var(--surface-tile-graphite);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -2px 4px 0 rgba(0, 0, 0, 0.5),
+        0 20px 40px -15px rgba(0, 0, 0, 0.7);
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .card-pedestal:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-3px);
+      box-shadow:
+        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -2px 4px 0 rgba(0, 0, 0, 0.5),
+        0 28px 56px -12px rgba(0, 0, 0, 0.85);
+    }
+
+    /* Studio Enclosure Frame */
+    .studio-pedestal {
+      position: relative;
+      background: #111116;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      box-shadow:
+        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -2px 4px 0 rgba(0, 0, 0, 0.7),
+        0 30px 80px -20px rgba(0, 0, 0, 0.95);
+      overflow: hidden;
+    }
+
+    .studio-chrome {
+      height: 42px;
+      background: #16171b;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 13px;
+      color: #9A9AA0;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 7px;
+    }
+    .traffic-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #333;
+    }
+    .traffic-dot.red { background: #FF5F56; }
+    .traffic-dot.yellow { background: #FFBD2E; }
+    .traffic-dot.green { background: #27C93F; }
+
+    #studio-viewport {
+      position: relative;
+      width: 100%;
+      height: 640px;
+      background: #18191d;
+    }
+
+    #filmcraft_canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      outline: none;
+    }
+
+    #loading-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      color: #C9C9CC;
+      background: #141418;
+      z-index: 5;
+      transition: opacity 0.4s ease;
+    }
+    #loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #fatal-dialog {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 10, 14, 0.92);
+      backdrop-filter: blur(10px);
+      color: #E6E6E8;
+      z-index: 20;
+    }
+    #fatal-dialog.on { display: flex; }
+
+    /* Trust Checks */
+    .trust-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #8E8E93;
+    }
+    .check-icon {
+      color: #30D158;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #studio-viewport {
+        height: 480px;
+      }
+      .hero-section {
+        min-height: 85vh;
+        padding-top: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Barra de Navegación Global (Frosted Glass) -->
+  <header class="nav-bar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <!-- Monograma SVG de Marca -->
+      <a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff;">
+        <svg width="24" height="24" viewBox="-1 -4 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="nav-fire" x1="12" y1="-3.2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FFE600"/>
+              <stop offset="30%" stop-color="#FF8800"/>
+              <stop offset="60%" stop-color="#DD0044"/>
+              <stop offset="100%" stop-color="#2233CC"/>
+            </linearGradient>
+          </defs>
+          <polygon points="6.54,18.64 12,-3.18 17.46,18.64 14.54,19.36 12,9.18 9.46,19.36" fill="url(#nav-fire)" />
+          <polygon points="7.17,7.75 -0.35,12.77 6.94,20.06 9.06,17.94 4.35,13.23 8.83,10.25" fill="url(#nav-fire)" />
+          <polygon points="17.06,20.06 24.35,12.77 16.83,7.75 15.17,10.25 19.65,13.23 14.94,17.94" fill="url(#nav-fire)" />
+        </svg>
+        <span style="font-weight: 700; font-size: 15px; letter-spacing: -0.02em;">Vértice FilmCraft</span>
+      </a>
+      <span class="pill-badge" style="padding: 2px 10px; font-size: 11px;">v0.19.0 WebGPU</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <a href="#features" class="btn-3d-dark" style="padding: 8px 18px; font-size: 13px;">Capacidades</a>
+      <a href="editor.html" class="btn-3d-flame" style="padding: 8px 20px; font-size: 13px;">Estudio Pantalla Completa</a>
+    </div>
+  </header>
+
+  <!-- 2. Hero Pedestal Section con Three.js Kinetic Extrusión 3D -->
+  <section class="hero-section">
+    <!-- Canvas Three.js con Monolito Extruido y Shader Reactivo -->
+    <div id="kinetic-hero-canvas"></div>
+
+    <div class="hero-content">
+      <div class="pill-badge">
+        <span class="pill-dot"></span>
+        <span>Desarrollado por Vertice Codeium</span>
+      </div>
+
+      <h1 class="hero-title">
+        Edición Cinematográfica.<br>
+        Directamente en tu <span class="text-flame">Navegador</span>.
+      </h1>
+
+      <p class="editorial-lead">
+        Editor no lineal profesional compilado a WebAssembly con aceleración nativa por WebGPU y WebCodecs. Sin descargas pesadas ni subida de archivos a la nube: tus medios permanecen 100% seguros en tu máquina.
+      </p>
+
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 8px;">
+        <a href="#studio-section" class="btn-3d-flame">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          Abrir Estudio Web
+        </a>
+        <a href="editor.html" class="btn-3d-dark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+          </svg>
+          Modo Inmersivo (100% Pantalla)
+        </a>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; margin-top: 12px;">
+        <div class="trust-badge">
+          <span class="check-icon">✓</span>
+          <span>WebGPU & WebGL2 Nativo</span>
+        </div>
+        <div class="trust-badge">
+          <span class="check-icon">✓</span>
+          <span>Zero Cloud: 0 KB subidos</span>
+        </div>
+        <div class="trust-badge">
+          <span class="check-icon">✓</span>
+          <span>Persistencia OPFS en Disco Local</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Contenedor de Estudio Interactivo (FilmCraft Web App) -->
+  <section id="studio-section" style="max-width: 1400px; margin: 0 auto; padding: 40px clamp(16px, 4vw, 40px) 80px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+      <div>
+        <span class="mono-metric" style="color: var(--thermal-blaze); text-transform: uppercase;">Workspace Vivo</span>
+        <h2 class="section-title" style="margin-top: 4px;">Estudio Web Integrado</h2>
+        <p style="font-size: 14px; color: #8E8E93; margin-top: 4px;">
+          💡 <strong>Fácil de usar:</strong> Arrastra y suelta cualquier video (MP4, MOV, WebM) o imagen directamente en el lienzo para comenzar a editar.
+        </p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button id="btn-reload-engine" class="btn-3d-dark" style="padding: 9px 18px; font-size: 13px;" title="Reiniciar motor WebAssembly">
+          ↻ Reiniciar Motor
+        </button>
+        <a href="editor.html" class="btn-3d-flame" style="padding: 9px 20px; font-size: 13px;">
+          Maximizar a Pantalla Completa ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Frame Pedestal del Estudio -->
+    <div class="studio-pedestal">
+      <div class="studio-chrome">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div class="traffic-lights">
+            <div class="traffic-dot red"></div>
+            <div class="traffic-dot yellow"></div>
+            <div class="traffic-dot green"></div>
+          </div>
+          <span class="mono-metric" style="font-size: 12px; color: #E5E5EA;">vertice-filmcraft-core // wasm32-unknown-unknown</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span id="telemetry-backend" class="pill-badge" style="padding: 2px 10px; font-size: 11px;">Backend: Inicializando…</span>
+          <span id="telemetry-latency" class="mono-metric" style="font-size: 11px; color: #30D158;">WASM: Listo</span>
+        </div>
+      </div>
+
+      <div id="studio-viewport">
+        <!-- Canvas de Renderizado de FilmCraft Web -->
+        <canvas id="filmcraft_canvas"></canvas>
+
+        <!-- Pantalla de Carga Fluida -->
+        <div id="loading-overlay">
+          <div style="position: relative; width: 64px; height: 64px;">
+            <svg width="64" height="64" viewBox="-1 -4 26 26" fill="none" style="animation: pulse-dot 1.8s infinite;">
+              <defs>
+                <linearGradient id="load-fire" x1="12" y1="-3.2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#FFE600"/>
+                  <stop offset="40%" stop-color="#FF4500"/>
+                  <stop offset="70%" stop-color="#D40078"/>
+                  <stop offset="100%" stop-color="#6014E4"/>
+                </linearGradient>
+              </defs>
+              <polygon points="6.54,18.64 12,-3.18 17.46,18.64 14.54,19.36 12,9.18 9.46,19.36" fill="url(#load-fire)" />
+              <polygon points="7.17,7.75 -0.35,12.77 6.94,20.06 9.06,17.94 4.35,13.23 8.83,10.25" fill="url(#load-fire)" />
+              <polygon points="17.06,20.06 24.35,12.77 16.83,7.75 15.17,10.25 19.65,13.23 14.94,17.94" fill="url(#load-fire)" />
+            </svg>
+          </div>
+          <div id="loading-status" style="font-weight: 500; font-size: 15px;">Inicializando Motor FilmCraft WASM…</div>
+          <div class="mono-metric" style="font-size: 12px; color: #8E8E93;">Cargando canal de render WebGPU / WebGL2</div>
+        </div>
+
+        <!-- Diálogo de Error Fatal / Recuperación Inteligente -->
+        <div id="fatal-dialog" role="alertdialog">
+          <div style="max-width: 580px; width: 90%; padding: 28px; background: #1C1D22; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; box-shadow: 0 24px 60px rgba(0,0,0,0.8);">
+            <h2 style="font-size: 20px; color: #FF4500; margin-bottom: 8px;">Estado del Motor Interrumpido</h2>
+            <p style="font-size: 14px; color: #A1A1A6; margin-bottom: 16px;">
+              El guardado automático en el sistema OPFS protege tus cambios en el navegador de manera persistente.
+            </p>
+            <pre id="fatal-message" style="max-height: 160px; overflow-y: auto; background: #101014; padding: 12px; border-radius: 8px; font-family: var(--font-mono); font-size: 12px; color: #E5E5EA; margin-bottom: 18px;"></pre>
+            <button id="fatal-reload-btn" class="btn-3d-flame" style="width: 100%;">Recuperar Sesión y Recargar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Museum Pedestal Grid: Capacidades de Alto Rendimiento -->
+  <section id="features" class="tile-charcoal">
+    <div style="max-width: 1280px; margin: 0 auto;">
+      <div style="text-align: center; max-width: 720px; margin: 0 auto 64px;">
+        <span class="mono-metric" style="color: var(--solar-spark); text-transform: uppercase;">Arquitectura Zero-Trust & WebGPU</span>
+        <h2 class="section-title" style="margin-top: 8px;">Diseñado para Creadores Exigentes</h2>
+        <p class="editorial-lead" style="margin: 14px auto 0;">
+          Construido desde los cimientos en Rust y WebAssembly, superando las limitaciones tradicionales del navegador mediante acceso directo al silicio de tu dispositivo.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 28px;">
+        <!-- Card 1 -->
+        <div class="card-pedestal">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255,69,0,0.15); border: 1px solid rgba(255,69,0,0.3); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF4500" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em;">Motor WebGPU de Gráficos Directos</h3>
+          <p style="color: #9A9AA0; font-size: 15px; line-height: 1.5;">
+            Pipeline de renderizado en WGSL con shaders optimizados para composición multicanal en tiempo real, transiciones suaves y corrección de color cinemática sin degradación.
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card-pedestal">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(212,0,120,0.15); border: 1px solid rgba(212,0,120,0.3); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D40078" stroke-width="2">
+              <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
+              <line x1="7" y1="2" x2="7" y2="22"/>
+              <line x1="17" y1="2" x2="17" y2="22"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <line x1="2" y1="7" x2="7" y2="7"/>
+              <line x1="2" y1="17" x2="7" y2="17"/>
+              <line x1="17" y1="17" x2="22" y2="17"/>
+              <line x1="17" y1="7" x2="22" y2="7"/>
+            </svg>
+          </div>
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em;">WebCodecs 4K/60fps</h3>
+          <p style="color: #9A9AA0; font-size: 15px; line-height: 1.5;">
+            Aprovecha la aceleración por hardware de la GPU para decodificar H.264, HEVC, AV1 y ProRes mediante llamadas nativas asíncronas con buffer LRU en RAM.
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card-pedestal">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(96,20,228,0.15); border: 1px solid rgba(96,20,228,0.3); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em;">Privacidad Absoluta (Zero-Cloud)</h3>
+          <p style="color: #9A9AA0; font-size: 15px; line-height: 1.5;">
+            Tus grabaciones, pistas de audio y secuencias nunca se transfieren a servidores externos. Todo el procesamiento y almacenamiento OPFS vive de forma estricta en tu máquina.
+          </p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card-pedestal">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255,221,0,0.15); border: 1px solid rgba(255,221,0,0.3); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFDD00" stroke-width="2">
+              <path d="M9 18V5l12-2v13"/>
+              <circle cx="6" cy="18" r="3"/>
+              <circle cx="18" cy="16" r="3"/>
+            </svg>
+          </div>
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em;">AudioWorklet Multitrack</h3>
+          <p style="color: #9A9AA0; font-size: 15px; line-height: 1.5;">
+            Sincronización milimétrica con reloj maestro de audio dedicado en hilo secundario independiente para reproducción sin tartamudeos ni cortes.
+          </p>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="card-pedestal">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(48,209,88,0.15); border: 1px solid rgba(48,209,88,0.3); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#30D158" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/>
+              <polyline points="7 3 7 8 15 8"/>
+            </svg>
+          </div>
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em;">Auto-Save OPFS Continuo</h3>
+          <p style="color: #9A9AA0; font-size: 15px; line-height: 1.5;">
+            Snapshot transaccional cada 5 segundos en el Origin Private File System. Si cierras la pestaña o se suspende el navegador, tu trabajo regresa automáticamente al recargar.
+          </p>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="card-pedestal">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(10,132,255,0.15); border: 1px solid rgba(10,132,255,0.3); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"/>
+              <polyline points="8 6 2 12 8 18"/>
+            </svg>
+          </div>
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em;">Control API & MCP Ready</h3>
+          <p style="color: #9A9AA0; font-size: 15px; line-height: 1.5;">
+            Automatiza renderizados, cortes y exports mediante la interfaz JavaScript <code>window.filmcraft</code>, totalmente compatible con agentes IA y scripts de automatización.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Minimal Apple Footer -->
+  <footer style="background: var(--surface-void); border-top: 1px solid var(--border-subtle); padding: 50px 24px 40px; text-align: center;">
+    <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+      
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <svg width="22" height="22" viewBox="-1 -4 26 26" fill="none">
+          <defs>
+            <linearGradient id="footer-fire" x1="12" y1="-3.2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FFE600"/>
+              <stop offset="50%" stop-color="#FF4500"/>
+              <stop offset="100%" stop-color="#6014E4"/>
+            </linearGradient>
+          </defs>
+          <polygon points="6.54,18.64 12,-3.18 17.46,18.64 14.54,19.36 12,9.18 9.46,19.36" fill="url(#footer-fire)" />
+          <polygon points="7.17,7.75 -0.35,12.77 6.94,20.06 9.06,17.94 4.35,13.23 8.83,10.25" fill="url(#footer-fire)" />
+          <polygon points="17.06,20.06 24.35,12.77 16.83,7.75 15.17,10.25 19.65,13.23 14.94,17.94" fill="url(#footer-fire)" />
+        </svg>
+        <span style="font-weight: 700; font-size: 14px;">Vértice FilmCraft</span>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; font-size: 13px; color: #86868B;">
+        <a href="TERMS_OF_SERVICE.md" style="color: inherit; text-decoration: none;" target="_blank">Términos del Servicio</a>
+        <span>•</span>
+        <a href="PRIVACY_POLICY.md" style="color: inherit; text-decoration: none;" target="_blank">Política de Privacidad</a>
+        <span>•</span>
+        <a href="https://github.com/storytold/filmcraft" style="color: inherit; text-decoration: none;" target="_blank">Código Fuente Original</a>
+      </div>
+
+      <div style="font-size: 12px; color: #6E6E73; line-height: 1.6;">
+        Desarrollado y remasterizado por <strong style="color: #A1A1A6;">Vertice Codeium</strong>.<br>
+        Inspirado en los fundamentos de código abierto de FilmCraft (Storyteller Team).<br>
+        Listo para funcionar en la web para cualquier persona mediante Cloudflare Pages.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts de Inicialización 3D y WASM -->
+  <script type="module">
+    import { initKineticHero } from './kinetic-scene.js';
+
+    // 1. Inicializar Hero 3D cinemático
+    initKineticHero('kinetic-hero-canvas');
+
+    // 2. Control de Panics y Carga del Motor WASM
+    window.filmcraftLoad = {};
+    let lastPanic = null;
+    const originalConsoleError = console.error.bind(console);
+    console.error = (...args) => {
+      const msg = args.map(String).join(" ");
+      if (/panicked at|memory allocation of/.test(msg)) lastPanic = msg;
+      originalConsoleError(...args);
+    };
+
+    window.filmcraftFatal = (what) => {
+      if (window.filmcraftLoad.fatal) return;
+      const msg = lastPanic || String(what && (what.stack || what.message) || what);
+      window.filmcraftLoad.fatal = msg;
+      const fatalEl = document.getElementById("fatal-dialog");
+      const msgEl = document.getElementById("fatal-message");
+      if (msgEl) msgEl.textContent = msg.split("\n\nStack:")[0];
+      if (fatalEl) fatalEl.classList.add("on");
+    };
+
+    document.getElementById("fatal-reload-btn").onclick = () => location.reload();
+    document.getElementById("btn-reload-engine").onclick = () => location.reload();
+
+    const isFatalError = (e) => e instanceof WebAssembly.RuntimeError || /panicked at|unreachable|memory access out of bounds/.test(String(e && e.message || e));
+    addEventListener("error", (ev) => {
+      if (window.filmcraftLoad.readyMs && isFatalError(ev.error || ev.message)) {
+        window.filmcraftFatal(ev.error || ev.message);
+      }
+    });
+    addEventListener("unhandledrejection", (ev) => {
+      if (window.filmcraftLoad.readyMs && isFatalError(ev.reason)) {
+        window.filmcraftFatal(ev.reason);
+      }
+    });
+
+    // 3. Inicio del Motor WASM
+    const startTime = performance.now();
+    const urlParams = new URLSearchParams(location.search);
+
+    try {
+      const { default: init, start } = await import("./filmcraft_web.js");
+      await init({ module_or_path: new URL("filmcraft_web_bg.wasm", location.href) });
+      window.filmcraftLoad.wasmMs = performance.now() - startTime;
+      
+      const statusText = document.getElementById("loading-status");
+      if (statusText) statusText.textContent = "Iniciando renderizador WebGPU…";
+
+      await start("filmcraft_canvas");
+      window.filmcraftLoad.readyMs = performance.now() - startTime;
+
+      // Ocultar overlay de carga
+      const overlay = document.getElementById("loading-overlay");
+      if (overlay) overlay.classList.add("hidden");
+
+      // Actualizar Telemetría
+      const backendPill = document.getElementById("telemetry-backend");
+      if (backendPill && window.filmcraft && typeof window.filmcraft.info === 'function') {
+        const info = window.filmcraft.info();
+        backendPill.textContent = `Backend: ${info.backend || 'WebGPU'}`;
+      } else if (backendPill) {
+        backendPill.textContent = "Backend: Activo";
+      }
+
+      const latencyPill = document.getElementById("telemetry-latency");
+      if (latencyPill) {
+        latencyPill.textContent = `Listo en ${Math.round(window.filmcraftLoad.readyMs)}ms`;
+      }
+    } catch (err) {
+      const errorText = String(err && err.stack || err);
+      window.filmcraftLoad.error = errorText;
+
+      // Fallback automático de WebGPU a WebGL2
+      if (!urlParams.has("webgl") && !urlParams.has("cpu") && /wgpu|webgpu|requestDevice|requestAdapter|GPUDevice|surface/i.test(errorText)) {
+        urlParams.set("webgl", "");
+        location.replace(location.pathname + "?" + urlParams.toString().replace(/=(&|$)/g, "$1") + location.hash);
+      } else {
+        const statusEl = document.getElementById("loading-status");
+        if (statusEl) {
+          statusEl.style.color = "#FF4500";
+          statusEl.textContent = "Error al iniciar FilmCraft: " + errorText;
+        }
+      }
+      console.warn("WASM engine startup:", err);
+    }
+  </script>
+</body>
+</html>

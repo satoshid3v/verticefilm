@@ -1,0 +1,5 @@
+# Cloudflare Pages Configuration
+# Desarrollado por Vertice Codeium
+name = "verticefilm"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "dist"

@@ -1,0 +1,10 @@
+node_modules/
+*~
+plan/
+/target
+/crates/*/target/
+# /dist is preserved for Cloudflare Pages direct static deployment
+/log
+.DS_Store
+.claude/worktrees/
+__pycache__/
