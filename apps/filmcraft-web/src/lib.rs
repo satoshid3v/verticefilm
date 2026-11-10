@@ -158,14 +158,14 @@ pub async fn start(canvas_id: String) -> Result<(), JsValue> {
     set_info("opfs", json!(opfs::available()));
 
     // Media kept in OPFS by earlier sessions come back under their paths (recovery).
-    let restored = if !in_host_mode && opfs::available() && !query_flag("fresh") { recovery::restore_media().await } else { 0 };
-    let recovered = if in_host_mode || query_flag("fresh") || query_flag("norecover") { None } else { recovery::load_snapshot().await };
+    let restored = if !in_host_mode && opfs::available() && !query_flag("fresh") && !query_flag("empty") { recovery::restore_media().await } else { 0 };
+    let recovered = if in_host_mode || query_flag("fresh") || query_flag("empty") || query_flag("norecover") { None } else { recovery::load_snapshot().await };
     webcodecs::probe().await;
 
     api::install()?;
     import::install_drop_handlers()?;
 
-    let demo = !in_host_mode && !query_flag("empty");
+    let demo = !in_host_mode && !query_flag("empty") && !query_flag("fresh");
     let mut web_options = eframe::WebOptions::default();
     // `?webgl`: WebGL2 only. The page reloads with it when starting on WebGPU fails (an adapter
     // whose device can't be created, a driver the browser rejects…); see `index.html`.

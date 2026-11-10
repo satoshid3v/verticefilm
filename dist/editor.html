@@ -131,6 +131,7 @@
       </div>
     </div>
     <div style="display: flex; align-items: center; gap: 10px;">
+      <button class="btn-action" id="btn-new-clean" style="background: linear-gradient(180deg, #FF4500 0%, #D40078 100%); border-color: rgba(255,220,0,0.3); font-weight: 600;">+ Proyecto Limpio</button>
       <span class="pill" id="ed-status">Iniciando WebGPU...</span>
       <button class="btn-action" onclick="document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()">Pantalla Completa</button>
       <button class="btn-action" onclick="location.reload()">Recargar</button>
@@ -203,6 +204,15 @@
       window.filmcraftLoad.wasmMs = performance.now() - t0;
       await init({ module_or_path: wasmBuffer });
       await start("filmcraft_canvas");
+      document.getElementById("btn-new-clean")?.addEventListener("click", () => {
+        if (window.filmcraft && typeof window.filmcraft.execute === "function") {
+          window.filmcraft.execute("file.newProject", { name: "Nuevo Proyecto" });
+          window.filmcraft.execute("file.newSequence", { name: "Secuencia 1" });
+          window.filmcraft.execute("mode.edit", {});
+        } else {
+          location.search = "?empty&fresh";
+        }
+      });
       window.filmcraftLoad.readyMs = performance.now() - t0;
       document.getElementById("loading").classList.add("hidden");
       document.getElementById("ed-status").textContent = "WebGPU Activo";

@@ -455,17 +455,24 @@
       </p>
 
       <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 8px;">
-        <a href="#studio-section" class="btn-3d-flame">
+        <a href="editor.html?empty&fresh" class="btn-3d-flame">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Iniciar Proyecto en Blanco
+        </a>
+        <a href="#studio-section" class="btn-3d-dark">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z"/>
           </svg>
-          Abrir Estudio Web
+          Explorar Proyecto Demo
         </a>
         <a href="editor.html" class="btn-3d-dark">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
           </svg>
-          Modo Inmersivo (100% Pantalla)
+          Modo Pantalla Completa
         </a>
       </div>
 
@@ -496,12 +503,15 @@
           💡 <strong>Fácil de usar:</strong> Arrastra y suelta cualquier video (MP4, MOV, WebM) o imagen directamente en el lienzo para comenzar a editar.
         </p>
       </div>
-      <div style="display: flex; gap: 10px;">
-        <button id="btn-reload-engine" class="btn-3d-dark" style="padding: 9px 18px; font-size: 13px;" title="Reiniciar motor WebAssembly">
-          ↻ Reiniciar Motor
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button id="btn-clean-project" class="btn-3d-flame" style="padding: 9px 18px; font-size: 13px;" title="Iniciar proyecto 100% en blanco">
+          + Proyecto en Blanco
         </button>
-        <a href="editor.html" class="btn-3d-flame" style="padding: 9px 20px; font-size: 13px;">
-          Maximizar a Pantalla Completa ↗
+        <button id="btn-reload-engine" class="btn-3d-dark" style="padding: 9px 18px; font-size: 13px;" title="Reiniciar motor WebAssembly">
+          ↻ Reiniciar
+        </button>
+        <a href="editor.html" class="btn-3d-dark" style="padding: 9px 20px; font-size: 13px;">
+          Pantalla Completa ↗
         </a>
       </div>
     </div>
@@ -696,10 +706,9 @@
         <a href="https://github.com/storytold/filmcraft" style="color: inherit; text-decoration: none;" target="_blank">Código Fuente Original</a>
       </div>
 
-      <div style="font-size: 12px; color: #6E6E73; line-height: 1.6;">
-        Desarrollado y remasterizado por <strong style="color: #A1A1A6;">Vertice Codeium</strong>.<br>
-        Inspirado en los fundamentos de código abierto de FilmCraft (Storyteller Team).<br>
-        Listo para funcionar en la web para cualquier persona mediante Cloudflare Pages.
+      <div style="font-size: 13px; color: #86868B; line-height: 1.6;">
+        Desarrollado y remasterizado por <strong style="color: #E5E5EA;">Vertice Codeium</strong>.<br>
+        Inspirado en los fundamentos de código abierto de FilmCraft.
       </div>
     </div>
   </footer>
