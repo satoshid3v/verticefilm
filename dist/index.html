@@ -752,12 +752,31 @@
 
     try {
       const { default: init, start } = await import("./filmcraft_web.js");
-      await init({ module_or_path: new URL("filmcraft_web_bg.wasm", location.href) });
+
+      const statusText = document.getElementById("loading-status");
+      if (statusText) statusText.textContent = "Descargando motor WASM optimizado (14.8 MB)…";
+
+      // Carga ultrarrápida comprimida con DecompressionStream nativo del navegador
+      const wasmGzUrl = new URL("filmcraft_web_bg.wasm.gz", location.href);
+      const resp = await fetch(wasmGzUrl);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status} al descargar filmcraft_web_bg.wasm.gz`);
+
+      let wasmBuffer;
+      if (typeof DecompressionStream !== "undefined") {
+        if (statusText) statusText.textContent = "Descomprimiendo en streaming nativo…";
+        const ds = new DecompressionStream("gzip");
+        const decompStream = resp.body.pipeThrough(ds);
+        const decompResponse = new Response(decompStream);
+        wasmBuffer = await decompResponse.arrayBuffer();
+      } else {
+        wasmBuffer = await resp.arrayBuffer();
+      }
+
+      if (statusText) statusText.textContent = "Compilando módulo WebAssembly…";
+      await init({ module_or_path: wasmBuffer });
       window.filmcraftLoad.wasmMs = performance.now() - startTime;
       
-      const statusText = document.getElementById("loading-status");
       if (statusText) statusText.textContent = "Iniciando renderizador WebGPU…";
-
       await start("filmcraft_canvas");
       window.filmcraftLoad.readyMs = performance.now() - startTime;
 
