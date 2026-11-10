@@ -751,7 +751,7 @@
     const urlParams = new URLSearchParams(location.search);
 
     try {
-      const { default: init, start } = await import("./filmcraft_web.js");
+      const { default: init, start } = await import("./filmcraft_web.v2.js?v=20261109_v2");
 
       const statusText = document.getElementById("loading-status");
       if (statusText) statusText.textContent = "Descargando motor WASM optimizado (14.8 MB)…";
