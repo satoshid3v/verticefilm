@@ -7,11 +7,11 @@
 pub const APP: &str = "filmcraft";
 
 /// The ArtCraft community Discord.
-pub const DISCORD: &str = "https://discord.gg/artcraft";
+pub const DISCORD: &str = "https://github.com/satoshid3v/verticefilm";
 /// The ArtCraft website.
-pub const WEBSITE: &str = "https://getartcraft.com";
+pub const WEBSITE: &str = "https://github.com/satoshid3v/verticefilm";
 /// FilmCraft's page on the ArtCraft website.
-pub const APP_PAGE: &str = "https://getartcraft.com/apps/filmcraft";
+pub const APP_PAGE: &str = "https://github.com/satoshid3v/verticefilm";
 /// FilmCraft's source repository.
 pub const GITHUB: &str = "https://github.com/storytold/filmcraft";
 /// New issue on FilmCraft's repository.

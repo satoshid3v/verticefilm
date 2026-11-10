@@ -182,12 +182,12 @@
     const t0 = performance.now();
     const params = new URLSearchParams(location.search);
     try {
-      const { default: init, start } = await import("./filmcraft_web.v2.js?v=20261109_v2");
+      const { default: init, start } = await import("./filmcraft_web.v3.js?v=20261109_v3_clean");
       const loadText = document.getElementById("ed-load-text");
       if (loadText) loadText.textContent = "Descargando motor WASM optimizado (14.8 MB)…";
 
-      const wasmGzUrl = new URL("filmcraft_web_bg.v2.wasm.gz?v=20261109_v2", location.href);
-      const resp = await fetch(wasmGzUrl);
+      const wasmGzUrl = new URL("filmcraft_web_bg.v3.wasm.gz?v=20261109_v3_clean", location.href);
+      const resp = await fetch(wasmGzUrl, { cache: "no-store" });
       if (!resp.ok) throw new Error(`HTTP ${resp.status} al descargar motor`);
 
       let wasmBuffer;
