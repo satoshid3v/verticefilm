@@ -756,10 +756,10 @@
       const statusText = document.getElementById("loading-status");
       if (statusText) statusText.textContent = "Descargando motor WASM optimizado (14.8 MB)…";
 
-      // Carga ultrarrápida comprimida con DecompressionStream nativo del navegador
-      const wasmGzUrl = new URL("filmcraft_web_bg.wasm.gz", location.href);
+      // Carga ultrarrápida v2 (con bypass estricto de caché CDN e inmutable)
+      const wasmGzUrl = new URL("filmcraft_web_bg.v2.wasm.gz?v=20261109_v2", location.href);
       const resp = await fetch(wasmGzUrl);
-      if (!resp.ok) throw new Error(`HTTP ${resp.status} al descargar filmcraft_web_bg.wasm.gz`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status} al descargar filmcraft_web_bg.v2.wasm.gz`);
 
       let wasmBuffer;
       if (typeof DecompressionStream !== "undefined") {

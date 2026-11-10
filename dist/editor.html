@@ -185,7 +185,7 @@
       const loadText = document.getElementById("ed-load-text");
       if (loadText) loadText.textContent = "Descargando motor WASM optimizado (14.8 MB)…";
 
-      const wasmGzUrl = new URL("filmcraft_web_bg.wasm.gz", location.href);
+      const wasmGzUrl = new URL("filmcraft_web_bg.v2.wasm.gz?v=20261109_v2", location.href);
       const resp = await fetch(wasmGzUrl);
       if (!resp.ok) throw new Error(`HTTP ${resp.status} al descargar motor`);
 

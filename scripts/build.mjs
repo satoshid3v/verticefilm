@@ -28,7 +28,7 @@ const requiredFiles = [
   'dist/index.html',
   'dist/editor.html',
   'dist/filmcraft_web.js',
-  'dist/filmcraft_web_bg.wasm.gz',
+  'dist/filmcraft_web_bg.v2.wasm.gz',
   'dist/audio-worklet.js',
   'dist/brand-logo.svg',
   'dist/three.module.js',
