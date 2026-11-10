@@ -568,12 +568,11 @@ impl<P: Pixel> Core<P> {
         let slices = if cfg.slices > 0 { cfg.slices.min(mbh) } else { threads.min(mbh.div_ceil(4)).max(1) };
         #[cfg(feature = "threads")]
         let pool = Pool {
-            pool: Some(
-                rayon::ThreadPoolBuilder::new()
-                    .num_threads(threads)
-                    .build()
-                    .map_err(|e| Error::InvalidConfig(format!("cannot build the {threads}-thread pool: {e}")))?,
-            ),
+            pool: if cfg!(target_arch = "wasm32") {
+                None
+            } else {
+                rayon::ThreadPoolBuilder::new().num_threads(threads).build().ok()
+            },
         };
         #[cfg(not(feature = "threads"))]
         let pool = Pool {};
