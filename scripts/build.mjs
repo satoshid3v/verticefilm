@@ -36,7 +36,9 @@ const requiredFiles = [
   'dist/brand-logo.svg',
   'dist/three.module.js',
   'dist/_headers',
-  'dist/_routes.json'
+  'dist/_routes.json',
+  'dist/robots.txt',
+  'dist/sitemap.xml'
 ];
 
 let allValid = true;

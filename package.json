@@ -8,6 +8,9 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "serve": "npx serve dist -l 8765",
+    "preview": "npx wrangler pages dev dist",
+    "deploy:dev": "npx wrangler pages deploy dist --project-name=verticefilm --branch=dev",
+    "deploy:prod": "npx wrangler pages deploy dist --project-name=verticefilm --branch=main",
     "deploy": "npx wrangler pages deploy dist --project-name=verticefilm"
   },
   "devDependencies": {

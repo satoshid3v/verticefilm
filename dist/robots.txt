@@ -1,0 +1,6 @@
+# robots.txt for Vertice FilmCraft
+# Desarrollado por Vertice Codeium
+User-agent: *
+Allow: /
+
+Sitemap: https://editordevideo.verticecodeium.com/sitemap.xml
